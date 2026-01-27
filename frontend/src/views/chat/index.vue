@@ -2,12 +2,13 @@
     <div class="chat">
         <div ref="scrollContainer" class="chat_scroll_box" @scroll="handleScroll">
             <div class="msg_list">
-                <div v-for="(session, id) in messagesList" :key='id'>
+                <!-- ⚡ Bolt Optimization: Use stable ID as key to prevent unnecessary re-renders when list is updated (e.g. unshift) -->
+                <div v-for="(session, index) in messagesList" :key="session.id">
                     <div v-if="session.role == 'user'">
                         <usermsg :content="session.content" :mentioned_items="session.mentioned_items"></usermsg>
                     </div>
                     <div v-if="session.role == 'assistant'">
-                        <botmsg :content="session.content" :session="session" :user-query="getUserQuery(id)" @scroll-bottom="scrollToBottom"
+                        <botmsg :content="session.content" :session="session" :user-query="getUserQuery(index)" @scroll-bottom="scrollToBottom"
                             :isFirstEnter="isFirstEnter"></botmsg>
                     </div>
                 </div>
