@@ -2,12 +2,12 @@
     <div class="chat">
         <div ref="scrollContainer" class="chat_scroll_box" @scroll="handleScroll">
             <div class="msg_list">
-                <div v-for="(session, id) in messagesList" :key='id'>
+                <div v-for="(session, index) in messagesList" :key="session.id || index">
                     <div v-if="session.role == 'user'">
                         <usermsg :content="session.content" :mentioned_items="session.mentioned_items"></usermsg>
                     </div>
                     <div v-if="session.role == 'assistant'">
-                        <botmsg :content="session.content" :session="session" :user-query="getUserQuery(id)" @scroll-bottom="scrollToBottom"
+                        <botmsg :content="session.content" :session="session" :user-query="getUserQuery(index)" @scroll-bottom="scrollToBottom"
                             :isFirstEnter="isFirstEnter"></botmsg>
                     </div>
                 </div>
@@ -305,12 +305,22 @@ const handleStopGeneration = () => {
     // API 调用成功后，后端的 stop 事件会清空它
 };
 
+// Generate a unique ID for local messages
+const generateLocalId = () => {
+    return `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
 const sendMsg = async (value, modelId = '', mentionedItems = []) => {
     userquery.value = value;
     isReplying.value = true;
     loading.value = true;
     // 将@提及的知识库和文件信息存入用户消息
-    messagesList.push({ content: value, role: 'user', mentioned_items: mentionedItems });
+    messagesList.push({
+        id: generateLocalId(),
+        content: value,
+        role: 'user',
+        mentioned_items: mentionedItems
+    });
     scrollToBottom();
     
     // Get agent mode status from settings store
