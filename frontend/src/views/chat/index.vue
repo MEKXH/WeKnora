@@ -2,7 +2,7 @@
     <div class="chat">
         <div ref="scrollContainer" class="chat_scroll_box" @scroll="handleScroll">
             <div class="msg_list">
-                <div v-for="(session, id) in messagesList" :key='id'>
+                <div v-for="(session, id) in messagesList" :key='session.id'>
                     <div v-if="session.role == 'user'">
                         <usermsg :content="session.content" :mentioned_items="session.mentioned_items"></usermsg>
                     </div>
@@ -310,7 +310,12 @@ const sendMsg = async (value, modelId = '', mentionedItems = []) => {
     isReplying.value = true;
     loading.value = true;
     // 将@提及的知识库和文件信息存入用户消息
-    messagesList.push({ content: value, role: 'user', mentioned_items: mentionedItems });
+    messagesList.push({
+        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        content: value,
+        role: 'user',
+        mentioned_items: mentionedItems
+    });
     scrollToBottom();
     
     // Get agent mode status from settings store
